@@ -1,0 +1,182 @@
+<html>
+
+<head>
+    <meta charset="utf-8" name="viewport" content="width=device-width" />
+    <title>
+        Node Server data
+    </title>
+    <!-- Importo el módulo socket.io que tengo en el proyecto -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- CSS only -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <!-- JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="http://code.highcharts.com/stock/highstock.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+</head>
+
+<body>
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="container">
+        <div class="row1">
+            <div class="col-lg-12">
+                <div class="container" id="chart" style="width:100%; height:300px;"></div>
+            </div>
+
+        </div>
+        <div class="row2">
+            <div class="col-6">
+                <div class="container" id="chart_ALM" style="width:100%; height:300px;"></div>
+            </div>
+            <div class="col-6">
+                <div class="container" id="chart_BS" style="width:100%; height:300px;"></div>
+            </div>
+        </div>
+        <!-- Comienza el Javascript -->
+        <script>
+            //       var socket = io.connect('http://192.168.1.9:8000');
+            var socket = io();
+
+            socket.on('connect', () => {
+                console.log('Conectado al servidor');
+            });
+            socket.on('disconnect', () => {
+                console.log('Desconectado del servidor');
+            });
+
+            // Creo un nuevo objeto 'Chart'
+            var chart, chartBS, chartALM;
+            chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: 'chart',
+                    defaultSeriesType: 'spline',
+                    events: {
+                        load: function() {
+                            socket.on('temperatureUpdate', function(time, data) {
+                                var series = chart.series[0];
+                                series.addPoint([time, data]);
+                            });
+                        }
+                    }
+                },
+                rangeSelector: {
+                    selected: 100
+                },
+                title: {
+                    text: 'Temperature Barcelona'
+                },
+                xAxis: {
+                    type: 'datetime',
+                    tickPixelInterval: 150,
+                    maxZoom: 20 * 1000
+                },
+                yAxis: {
+                    minPadding: 0.2,
+                    maxPadding: 0.2,
+                    title: {
+                        text: 'Temperature ºC',
+                        margin: 80
+                    }
+                },
+                series: [{
+                    name: 'Temperature',
+                    data: []
+                }],
+                credits: {
+                    enabled: false
+                }
+            });
+
+            chartBS = new Highcharts.StockChart({
+                chart: {
+                    renderTo: 'chart_BS',
+                    defaultSeriesType: 'spline',
+                    events: {
+                        load: function() {
+                            // Cada vez que reciba un valor desde el socket, lo meto en la gráfica
+                            socket.on('BSUpdate', function(time, data) {
+                                console.log(time);
+                                console.log(data);
+                                var series = chartBS.series[0];
+                                series.addPoint([time, data]);
+                            });
+                        }
+                    }
+                },
+                rangeSelector: {
+                    selected: 100
+                },
+                title: {
+                    text: 'Banc Sabadell'
+                },
+                xAxis: {
+                    type: 'datetime',
+                    tickPixelInterval: 150,
+                    maxZoom: 20 * 1000
+                },
+                yAxis: {
+                    minPadding: 0.2,
+                    maxPadding: 0.2,
+                    title: {
+                        text: 'Value',
+                        margin: 10
+                    }
+                },
+                series: [{
+                    name: 'Value',
+                    data: []
+                }],
+                credits: {
+                    enabled: false
+                }
+            });
+            chartALM = new Highcharts.StockChart({
+                chart: {
+                    renderTo: 'chart_ALM',
+                    defaultSeriesType: 'spline',
+                    events: {
+                        load: function() {
+                            // Cada vez que reciba un valor desde el socket, lo meto en la gráfica
+                            socket.on('ALMUpdate', function(time, data) {
+                                console.log(time);
+                                console.log(data);
+                                var series = chartALM.series[0];
+                                series.addPoint([time, data]);
+                            });
+                        }
+                    }
+                },
+                rangeSelector: {
+                    selected: 100
+                },
+                title: {
+                    text: 'Almirall'
+                },
+                xAxis: {
+                    type: 'datetime',
+                    tickPixelInterval: 150,
+                    maxZoom: 20 * 1000
+                },
+                yAxis: {
+                    minPadding: 0.2,
+                    maxPadding: 0.2,
+                    title: {
+                        text: 'Value',
+                        margin: 10
+                    }
+                },
+                series: [{
+                    name: 'Value',
+                    data: []
+                }],
+                credits: {
+                    enabled: false
+                }
+            });
+        </script>
+</body>
+
+</html>
