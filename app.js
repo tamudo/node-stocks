@@ -35,11 +35,10 @@ console.log('-------- Start Cron ----------');
 // cron each minute;*/1 * * * *
 // cron five minute;*/5 * * * *
 // cron ten minute;*/10 * * * *
-let cron = schedule.scheduleJob(CRON_1Min, async function(fireDate) {
-    console.log('This job was supposed to run at ' + fireDate + ', actually ran at ' + new Date());
+let cron = schedule.scheduleJob(CRON_10Min, async function(fireDate) {
+    // console.log('This job was supposed to run at ' + fireDate + ', actually ran at ' + new Date());
     await Promise.all([obtainMetdata(), obtainBS(), obtainALM()]);
     //paintPlot();
-    console.log(2);
 });
 
 
@@ -79,7 +78,7 @@ let obtainBS = () => {
             const $ = cheerio.load(response.data);
             const bsValue = $("#last_last").text();
             let date = new Date().getTime();
-            console.log('BS:' + parseFloat(bsValue.replace(',', '.'))); //BSUpdate
+            //   console.log('BS:' + parseFloat(bsValue.replace(',', '.'))); //BSUpdate
             io.emit('BSUpdate', date, parseFloat(bsValue.replace(',', '.')));
 
 
@@ -94,9 +93,9 @@ let obtainALM = () => {
         .then((response) => {
             const $ = cheerio.load(response.data);
             const bsValue = $("#last_last").text();
-            console.log('Almirall:' + bsValue);
+            //            console.log('Almirall:' + bsValue);
             let date = new Date().getTime();
-            console.log('BS:' + parseFloat(bsValue.replace(',', '.'))); //BSUpdate
+            //          console.log('BS:' + parseFloat(bsValue.replace(',', '.'))); //BSUpdate
             io.emit('ALMUpdate', date, parseFloat(bsValue.replace(',', '.')));
 
         })
